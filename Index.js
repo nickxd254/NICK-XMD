@@ -49,8 +49,8 @@ if (!fs.existsSync(sessionDir)) {
 
 async function loadGiftedSession() {
     if (!config.SESSION_ID) return false;
-    if (config.SESSION_ID.startsWith("NICK-XMD~")) {
-        const compressedBase64 = config.SESSION_ID.substring("NICK-XMD~".length);
+    if (config.SESSION_ID.startsWith("POPKID~")) {
+        const compressedBase64 = config.SESSION_ID.substring("POPKID~".length);
         try {
             const compressedBuffer = Buffer.from(compressedBase64, 'base64');
             if (compressedBuffer[0] === 0x1f && compressedBuffer[1] === 0x8b) {
