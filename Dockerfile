@@ -1,28 +1,16 @@
-FROM node:20-bookworm
+FROM node:lts-buster
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y \
-      ffmpeg \
-      imagemagick \
-      webp && \
-    apt-get upgrade -y && \
-    rm -rf /var/lib/apt/lists/*
+# Clone bot from GitHub
+RUN git clone https://github.com/nickxd254/NICK-XMD.git /root/nick-bot
 
 # Set working directory
-WORKDIR /app
-
-# Copy package.json only
-COPY package.json ./
+WORKDIR /root/nick-bot
 
 # Install dependencies
-RUN npm install && npm install -g qrcode-terminal pm2
+RUN npm install && npm install -g pm2
 
-# Copy the rest of the app
-COPY . .
+# Expose port
+EXPOSE 9090
 
-# Expose app port
-EXPOSE 3000
-
-# Start the app
+# Start the bot
 CMD ["npm", "start"]
