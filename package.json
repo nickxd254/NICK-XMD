@@ -1,4 +1,5 @@
-"name": "POPKID-XTR",
+{
+  "name": "POPKID-XTR",
   "version": "5.0.0",
   "description": "POPKID-XTR, a Multi Device Whatsapp Bot to Enhance Whatsapp Communication Experience",
   "main": "./index.js",
