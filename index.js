@@ -1,4 +1,5 @@
-default: giftedConnect, 
+const { 
+    default: giftedConnect, 
     isJidGroup, 
     jidNormalizedUser,
     isJidBroadcast,
@@ -531,4 +532,349 @@ const isSuperUser = finalSuperUsers.includes(sender);
                             } catch (err) {
                                 console.error("Reply error:", err);
                             }
-                  
+                        };*/
+
+                        const react = async (emoji) => {
+                            if (typeof emoji !== 'string') return;
+                            try {
+                                await Gifted.sendMessage(from, { 
+                                    react: { 
+                                        key: ms.key, 
+                                        text: emoji
+                                    }
+                                });
+                            } catch (err) {
+                                console.error("Reaction error:", err);
+                            }
+                        };
+
+                        const edit = async (text, message) => {
+                            if (typeof text !== 'string') return;
+                            
+                            try {
+                                await Gifted.sendMessage(from, {
+                                    text: text,
+                                    edit: message.key
+                                }, { 
+                                    quoted: ms 
+                                });
+                            } catch (err) {
+                                console.error("Edit error:", err);
+                            }
+                        };
+
+                        const del = async (message) => {
+                            if (!message?.key) return; 
+
+                            try {
+                                await Gifted.sendMessage(from, {
+                                    delete: message.key
+                                }, { 
+                                    quoted: ms 
+                                });
+                            } catch (err) {
+                                console.error("Delete error:", err);
+                            }
+                        };
+
+                        if (gmd.react) {
+                            try {
+                                await Gifted.sendMessage(from, {
+                                    react: { 
+                                        key: ms.key, 
+                                        text: gmd.react
+                                    }
+                                });
+                            } catch (err) {
+                                console.error("Reaction error:", err);
+                            }
+                        }
+
+                        Gifted.getJidFromLid = async (lid) => {
+    const groupMetadata = await Gifted.groupMetadata(from);
+    const match = groupMetadata.participants.find(p => p.lid === lid || p.id === lid);
+    return match?.pn || null;
+};
+
+Gifted.getLidFromJid = async (jid) => {
+    const groupMetadata = await Gifted.groupMetadata(from);
+    const match = groupMetadata.participants.find(p => p.jid === jid || p.id === jid);
+    return match?.lid || null;
+};
+                           
+
+                        let fileType;
+                        (async () => {
+                            fileType = await import('file-type');
+                        })();
+
+                        Gifted.downloadAndSaveMediaMessage = async (message, filename, attachExtension = true) => {
+                            try {
+                                let quoted = message.msg ? message.msg : message;
+                                let mime = (message.msg || message).mimetype || '';
+                                let messageType = message.mtype ? 
+                                    message.mtype.replace(/Message/gi, '') : 
+                                    mime.split('/')[0];
+                                
+                                const stream = await downloadContentFromMessage(quoted, messageType);
+                                let buffer = Buffer.from([]);
+                                
+                                for await (const chunk of stream) {
+                                    buffer = Buffer.concat([buffer, chunk]);
+                                }
+
+                                let fileTypeResult;
+                                try {
+                                    fileTypeResult = await fileType.fileTypeFromBuffer(buffer);
+                                } catch (e) {
+                                    console.log("file-type detection failed, using mime type fallback");
+                                }
+
+                                const extension = fileTypeResult?.ext || 
+                                            mime.split('/')[1] || 
+                                            (messageType === 'image' ? 'jpg' : 
+                                            messageType === 'video' ? 'mp4' : 
+                                            messageType === 'audio' ? 'mp3' : 'bin');
+
+                                const trueFileName = attachExtension ? 
+                                    `${filename}.${extension}` : 
+                                    filename;
+                                
+                                await fs.writeFile(trueFileName, buffer);
+                                return trueFileName;
+                            } catch (error) {
+                                console.error("Error in downloadAndSaveMediaMessage:", error);
+                                throw error;
+                            }
+                        };
+                        
+                        const conText = {
+                            m: ms,
+                            mek: ms,
+                            edit,
+                            react,
+                            del,
+                            arg: args,
+                            quoted,
+                            isCmd: isCommand,
+                            command,
+                            isAdmin,
+                            isBotAdmin,
+                            sender,
+                            pushName,
+                            setSudo,
+                            delSudo,
+                            q: args.join(" "),
+                            reply,
+                            config,
+                            superUser,
+                            tagged,
+                            mentionedJid,
+                            isGroup,
+                            groupInfo,
+                            groupName,
+                            getSudoNumbers,
+                            authorMessage: messageAuthor,
+                            user: user || '',
+                            gmdBuffer, gmdJson, 
+                            formatAudio, formatVideo,
+                            groupMember: isGroup ? messageAuthor : '',
+                            from,
+                            tagged,
+                            groupAdmins,
+                            participants,
+                            repliedMessage,
+                            quotedMsg,
+                            quotedUser,
+                            isSuperUser,
+                            botMode,
+                            botPic,
+                            botFooter,
+                            botCaption,
+                            botVersion,
+                            ownerNumber,
+                            ownerName,
+                            botName,
+                            giftedRepo,
+                            isSuperAdmin,
+                            getMediaBuffer,
+                            getFileContentType,
+                            bufferToStream,
+                            uploadToPixhost,
+                            uploadToImgBB,
+                            setCommitHash, 
+                            getCommitHash,
+                            uploadToGithubCdn,
+                            uploadToGiftedCdn,
+                            uploadToPasteboard,
+                            uploadToCatbox,
+                            newsletterUrl,
+                            newsletterJid,
+                            GiftedTechApi,
+                            GiftedApiKey,
+                            botPrefix,
+                            timeZone };
+
+                        await gmd.function(from, Gifted, conText);
+
+                    } catch (error) {
+                        console.error(`Command error [${cmd}]:`, error);
+                        try {
+                            await Gifted.sendMessage(from, {
+                                text: `🚨 Command failed: ${error.message}`,
+                                ...createContext(messageAuthor, {
+                                    title: "Error",
+                                    body: "Command execution failed"
+                                })
+                            }, { quoted: ms });
+                        } catch (sendErr) {
+                            console.error("Error sending error message:", sendErr);
+                        }
+                    }
+                }
+            }
+            
+        });
+
+        Gifted.ev.on("connection.update", async (update) => {
+            const { connection, lastDisconnect } = update;
+            
+            if (connection === "connecting") {
+                console.log("🕗 Connecting Bot...");
+                reconnectAttempts = 0;
+            }
+
+            if (connection === "open") {
+                console.log("✅ Connection Instance is Online");
+                reconnectAttempts = 0;
+                
+                setTimeout(async () => {
+                    try {
+                        const totalCommands = commands.filter((command) => command.pattern).length;
+                        console.log('💜Popkid Xtr Connected to Whatsapp✅!');
+                            
+                        if (startMess === 'true') {
+                            const md = botMode === 'public' ? "public" : "private";
+                            const connectionMsg = `
+*╭─❖  ${botName}  ❖─╮*
+│
+│  💠 *Status:* 𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄𝐃 ✅
+│
+│  ⚙️ *Prefix:* [ ${botPrefix} ]
+│  📦 *Plugins:* ${totalCommands.toString()}
+│  🔘 *Mode:* ${md}
+│  👑 *Owner:* ${ownerNumber}
+│  🎓 *Tutorials:* ${config.YT}
+│  📰 *Updates:* ${newsletterUrl}
+│
+*╰───────────────❖╯*
+
+> 💫 *${botCaption}*`;
+
+await Gifted.sendMessage(
+    Gifted.user.id,
+    {
+        text: connectionMsg,
+        ...createContext(botName, {
+            title: "BOT INTEGRATED",
+            body: "Status: Ready for Use"
+        })
+    },
+    {
+        disappearingMessagesInChat: true,
+        ephemeralExpiration: 300,
+    }
+);
+}
+} catch (err) {
+    console.error("Post-connection setup error:", err);
+}
+}, 5000);
+}
+
+if (connection === "close") {
+    const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+
+    console.log(`Connection closed due to: ${reason}`);
+
+    if (reason === DisconnectReason.badSession) {
+        console.log("Bad session file, delete it and scan again");
+        try {
+            await fs.remove(__dirname + "/pop/session");
+        } catch (e) {
+            console.error("Failed to remove session:", e);
+        }
+        process.exit(1);
+    } else if (reason === DisconnectReason.connectionClosed) {
+        console.log("Connection closed, reconnecting...");
+        setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
+    } else if (reason === DisconnectReason.connectionLost) {
+        console.log("Connection lost from server, reconnecting...");
+        setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
+    } else if (reason === DisconnectReason.connectionReplaced) {
+        console.log("Connection replaced, another new session opened");
+        process.exit(1);
+    } else if (reason === DisconnectReason.loggedOut) {
+        console.log("Device logged out, delete session and scan again");
+        try {
+            await fs.remove(__dirname + "/pop/session");
+        } catch (e) {
+            console.error("Failed to remove session:", e);
+        }
+        process.exit(1);
+    } else if (reason === DisconnectReason.restartRequired) {
+        console.log("Restart required, restarting...");
+        setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
+    } else if (reason === DisconnectReason.timedOut) {
+        console.log("Connection timed out, reconnecting...");
+        setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY * 2);
+    } else {
+        console.log(`Unknown disconnect reason: ${reason}, attempting reconnection...`);
+        setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
+    }
+}
+});
+
+const cleanup = () => {
+    if (store) {
+        store.destroy();
+    }
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);
+
+} catch (error) {
+    console.error('Socket initialization error:', error);
+    setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
+}
+}
+
+async function reconnectWithRetry() {
+    if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+        console.error('Max reconnection attempts reached. Exiting...');
+        process.exit(1);
+    }
+
+    reconnectAttempts++;
+    const delay = Math.min(RECONNECT_DELAY * Math.pow(2, reconnectAttempts - 1), 300000);
+
+    console.log(`Reconnection attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms...`);
+
+    setTimeout(async () => {
+        try {
+            await startGifted();
+        } catch (error) {
+            console.error('Reconnection failed:', error);
+            reconnectWithRetry();
+        }
+    }, delay);
+}
+
+setTimeout(() => {
+    startGifted().catch(err => {
+        console.error("Initialization error:", err);
+        reconnectWithRetry();
+    });
+}, 5000);
+
