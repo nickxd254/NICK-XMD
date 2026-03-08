@@ -747,29 +747,6 @@ Gifted.getLidFromJid = async (jid) => {
             if (connection === "open") {
                 console.log("✅ Connection Instance is Online");
                 reconnectAttempts = 0;
-
-                // --- START AUTOFOLLOW NEWSLETTER AND STARTUP MESSAGE ---
-                try {
-                    let up = `╔════════════════╗
-║ 🤖 ▰𝗖𝗢𝗡𝗡𝗘𝗖𝗧𝗘𝗗▰
-╠════════════════╣
-║ 🔑 PREFIX  : ${botPrefix}
-║ 👨‍💻 DEV     : POPKID-MD
-║ 📞 DEV NO : 254732297194
-╚════════════════╝`;
-                    
-                    await Gifted.sendMessage(Gifted.user.id, { 
-                        image: { url: `https://files.catbox.moe/j9ia5c.png` }, 
-                        caption: up 
-                    });
-
-                    const channelJid = "120363423997837331@newsletter";
-                    await Gifted.newsletterFollow(channelJid);
-                    console.log(`Successfully followed channel: ${channelJid}`);
-                } catch (error) {
-                    console.error("[ ❌ ] Error during post-connect setup:", error);
-                }
-                // --- END AUTOFOLLOW NEWSLETTER AND STARTUP MESSAGE ---
                 
                 setTimeout(async () => {
                     try {
