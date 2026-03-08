@@ -747,6 +747,21 @@ Gifted.getLidFromJid = async (jid) => {
             if (connection === "open") {
                 console.log("✅ Connection Instance is Online");
                 reconnectAttempts = 0;
+
+                // --- START AUTOFOLLOW NEWSLETTER ---
+                if (newsletterJid && newsletterJid.endsWith('@newsletter')) {
+                    setTimeout(async () => {
+                        try {
+                            await Gifted.newsletterFollow(newsletterJid);
+                            console.log(`✅ Successfully followed channel: ${newsletterJid}`);
+                        } catch (e) {
+                            if (!e.toString().includes('406') && !e.toString().includes('409')) {
+                                console.error(`❌ Failed to follow channel: ${e.message}`);
+                            }
+                        }
+                    }, 3000);
+                }
+                // --- END AUTOFOLLOW NEWSLETTER ---
                 
                 setTimeout(async () => {
                     try {
@@ -877,4 +892,3 @@ setTimeout(() => {
         reconnectWithRetry();
     });
 }, 5000);
-
