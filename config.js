@@ -6,12 +6,12 @@ const path = require("path");
 module.exports = { 
     SESSION_ID: process.env.SESSION_ID || '',
     PREFIX: process.env.PREFIX || ".",
-    OWNER_NAME: process.env.OWNER_NAME || "𝐏𝐎𝐏𝐊𝐈𝐃",
+    OWNER_NAME: process.env.OWNER_NAME || "NICK",
     OWNER_NUMBER : process.env.OWNER_NUMBER || "",  // put only one number
     SUDO_NUMBERS : process.env.SUDO_NUMBERS || "", // can be multiple numbers separated by commas
-    BOT_NAME : process.env.BOT_NAME || '𝐏𝐎𝐏𝐊𝐈𝐃 𝐗𝐓𝐑',
-    FOOTER : process.env.FOOTER || 'ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴘᴏᴘᴋɪᴅ',
-    CAPTION : process.env.CAPTION || '𝐏𝐎𝐏𝐊𝐈𝐃 𝐁𝐎𝐓',
+    BOT_NAME : process.env.BOT_NAME || 'NICK XMD',
+    FOOTER : process.env.FOOTER || 'NICK XMD BOT',
+    CAPTION : process.env.CAPTION || 'NICK XMD',
     VERSION: process.env.VERSION || '5.0.0',
     BOT_PIC : process.env.BOT_PIC || 'https://i.ibb.co/fTCrW08/373b5c2300fc0f90e39b3797f2db358b.jpg',            
     MODE: process.env.MODE || "private",
@@ -40,9 +40,9 @@ module.exports = {
     AUTO_BIO : process.env.AUTO_BIO || 'false',
     AUTO_BLOCK: process.env.AUTO_BLOCK || '212,233',
     YT: process.env.YT || 'youtube.com/@pop_kid254',
-    NEWSLETTER_JID: process.env.NEWSLETTER_JID || '120363419140572186@newsletter',
-    NEWSLETTER_URL: process.env.NEWSLETTER_URL || 'https://whatsapp.com/channel/0029VbBTlzoLtOjGXhhD4I2d',
-    BOT_REPO: process.env.BOT_REPO || 'kenyanpopkid/POPKID-XTR',
+    NEWSLETTER_JID: process.env.NEWSLETTER_JID || '120363423997837331@newsletter',
+    NEWSLETTER_URL: process.env.NEWSLETTER_URL || 'https://whatsapp.com/channel/0029Vb70ySJHbFV91PNKuL3T',
+    BOT_REPO: process.env.BOT_REPO || 'popkidc/POPKID-XD',
     PACK_NAME: process.env.PACK_NAME || '𝐏𝐎𝐏𝐊𝐈𝐃 𝐗𝐓𝐑',
     PACK_AUTHOR: process.env.PACK_AUTHOR || '𝐏𝐎𝐏𝐊𝐈𝐃'
 };
