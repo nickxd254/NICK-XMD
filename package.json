@@ -9,9 +9,9 @@
     "node": ">=20.x"
   },
   "scripts": {
-    "start": "pm2 start index.js --name POPKID-XTR",
+    "start": "pm2 start index.js --name NICK-XMD",
     "stop": "pm2 stop NICK-XMD",
-    "restart": "pm2 restart NICK-XMF"
+    "restart": "pm2 restart NICK-XMD"
   },
   "keywords": [
     "POPKID-XTR",
