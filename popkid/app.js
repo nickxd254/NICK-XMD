@@ -37,7 +37,7 @@ pmd({
 │ 📅 *Updated:* ${app.updated}
 │ 🧮 *Size:* ${appSizeMB} MB
 │
-╰────⟡ *Powered by Popkid-AI*
+╰────⟡ *Powered by nick*
 `.trim();
 
     // Send app info message
