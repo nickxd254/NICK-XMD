@@ -1,7 +1,7 @@
 {
-  "name": "POPKID-XTR",
+  "name": "NICK-XMD",
   "version": "5.0.0",
-  "description": "POPKID-XTR, a Multi Device Whatsapp Bot to Enhance Whatsapp Communication Experience",
+  "description": "NICK-XMD, a Multi Device Whatsapp Bot to Enhance Whatsapp Communication Experience",
   "main": "./index.js",
   "type": "commonjs",
   "engines": {
@@ -10,8 +10,8 @@
   },
   "scripts": {
     "start": "pm2 start index.js --name POPKID-XTR",
-    "stop": "pm2 stop POPKID-XTR",
-    "restart": "pm2 restart POPKID-XTR"
+    "stop": "pm2 stop NICK-XMD",
+    "restart": "pm2 restart NICK-XMF"
   },
   "keywords": [
     "POPKID-XTR",
