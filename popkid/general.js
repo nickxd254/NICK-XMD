@@ -10,12 +10,10 @@ const { pmd, commands, monospace, formatBytes } = require("../pop"),
       { downloadContentFromMessage } = require('gifted-baileys'),
       ram = `${formatBytes(freeMemoryBytes)}/${formatBytes(totalMemoryBytes)}`;
 
-
-
 pmd({
   pattern: "menu",
   aliases: ["help", "allmenu", "mainmenu"],
-  react: "🪀",
+  react: "🌌",
   category: "general",
   description: "Fetch bot main menu",
 }, async (from, Popkid, conText) => {
@@ -58,45 +56,41 @@ pmd({
     return menu;
   }, {});
 
-  // 🌟 Stylish Header
+  // 🌟 Premium Header Design
   const header = `
-╭─❖  ${botName}  ❖─╮
-│
-│  💠 *Status:*  𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄𝐃 ✅
-│  ⚙️ *Mode:*  ${botMode}
-│  🔰 *Prefix:*  [ ${botPrefix} ]
-│  👤 *User:*  ${pushName}
-│  🧩 *Plugins:*  ${totalCommands.toString()}
-│  🪄 *Version:*  ${botVersion}
-│  ⏱ *Uptime:*  ${uptime}
-│  🕓 *Time:*  ${time}
-│  📅 *Date:*  ${date}
-│  🌍 *TimeZone:*  ${timeZone}
-│
-╰───────────────────────❖
-${readmore}
-`.trim();
+╔════════════════════════╗
+  ✨ *${botName.toUpperCase()}* ✨
+╚════════════════════════╝
+┌────────────────────────
+│ 👤 *ᴜsᴇʀ:* ${pushName}
+│ 🛡️ *ᴍᴏᴅᴇ:* ${botMode}
+│ 🔖 *ᴘʀᴇғɪx:* [ ${botPrefix} ]
+│ 🕒 *ᴜᴘᴛɪᴍᴇ:* ${uptime}
+│ 📅 *ᴅᴀᴛᴇ:* ${date}
+│ ⏳ *ᴛɪᴍᴇ:* ${time}
+│ 🧩 *ᴄᴏᴍᴍᴀɴᴅs:* ${totalCommands}
+└────────────────────────
+${readmore}`.trim();
 
-  // 🎛 Category Formatter
+  // 🎛 Modern Category Formatter
   const formatCategory = (category, cmds) => {
-    const title = `╭─⌬  *${category.toUpperCase()}*  ⌬─╮\n`;
-    const body = cmds.map(cmd => `│  🩷 ${botPrefix + cmd}`).join("\n");
-    const footer = `╰───────────────────╯\n`;
-    return `${title}${body}\n${footer}`;
+    const title = `\n╭───〔 *${category.toUpperCase()}* 〕───┈\n`;
+    const body = cmds.map(cmd => `│ ✥ ${botPrefix + cmd}`).join("\n");
+    const footer = `\n╰──────────────────────────┈\n`;
+    return `${title}${body}${footer}`;
   };
 
-  // 🧾 Build Menu
-  let menu = `${header}\n\n`;
+  let menu = `${header}\n`;
   for (const [category, cmds] of Object.entries(categorized)) {
-    menu += `${formatCategory(category, cmds)}\n`;
+    menu += `${formatCategory(category, cmds)}`;
   }
 
   const message = {
     image: { url: botPic },
-    caption: `${menu.trim()}\n\n> *${botFooter}*`,
+    caption: `${menu}\n\n *${botFooter}*`,
     contextInfo: {
       mentionedJid: [sender],
-      forwardingScore: 5,
+      forwardingScore: 999,
       isForwarded: true,
       forwardedNewsletterMessageInfo: {
         newsletterJid: newsletterJid,
@@ -107,37 +101,29 @@ ${readmore}
   };
 
   await Popkid.sendMessage(from, message, { quoted: mek });
-  await react("✅");
+  await react("👑");
 });
-
 
 pmd({
   pattern: "return",
   aliases: ['details', 'det', 'ret'],
-  react: "⚡",
+  react: "⚙️",
   category: "owner",
   description: "Displays the full raw quoted message using Baileys structure.",
 }, async (from, Popkid, conText) => {
   const { mek, reply, react, quotedMsg, isSuperUser, botName, newsletterJid } = conText;
   
-  if (!isSuperUser) {
-    return reply(`Owner Only Command!`);
-  }
-  
-  if (!quotedMsg) {
-    return reply(`Please reply to/quote a message`);
-  }
+  if (!isSuperUser) return reply(`*🚫 ACCESS DENIED!* Owner Only.`);
+  if (!quotedMsg) return reply(`*⚠️ Please reply to a message.*`);
 
   try {
     const jsonString = JSON.stringify(quotedMsg, null, 2);
     const chunks = jsonString.match(/[\s\S]{1,100000}/g) || [];
 
     for (const chunk of chunks) {
-      const formattedMessage = `\`\`\`\n${chunk}\n\`\`\``;
+      const formattedMessage = `*『 ᴅᴇʙᴜɢ ʟᴏɢ 』*\n\n\`\`\`json\n${chunk}\n\`\`\``;
 
-      await Popkid.sendMessage(
-        from,
-        {
+      await Popkid.sendMessage(from, {
           text: formattedMessage,
           contextInfo: {
             forwardingScore: 5,
@@ -148,186 +134,116 @@ pmd({
               serverMessageId: 143
             },
           },
-        },
-        { quoted: mek }
-      );
+        }, { quoted: mek });
       await react("✅");
     }
   } catch (error) {
-    console.error("Error processing quoted message:", error);
-    await reply(`❌ An error occurred while processing the message.`);
+    await reply(`❌ Error: ${error.message}`);
   }
 });
 
-
 pmd({ 
   pattern: "ping",
-  react: "⚡",
+  react: "🚀",
   category: "general",
   description: "Check bot response speed",
 }, async (from, Popkid, conText) => {
-      const { mek, react, newsletterJid, botName } = conText;
+    const { mek, react, newsletterJid, botName } = conText;
     const startTime = process.hrtime();
-
     await new Promise(resolve => setTimeout(resolve, Math.floor(80 + Math.random() * 420)));
-    
     const elapsed = process.hrtime(startTime);
     const responseTime = Math.floor((elapsed[0] * 1000) + (elapsed[1] / 1000000));
 
     await Popkid.sendMessage(from, {
-      text: `⚡ Pong: ${responseTime}ms`,
+      text: `*ʟᴀᴛᴇɴᴄʏ:* ${responseTime} *ᴍs* ⚡`,
       contextInfo: {
         forwardingScore: 5,
         isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: newsletterJid,
-          newsletterName: botName,
-          serverMessageId: 143
-        }
+        forwardedNewsletterMessageInfo: { newsletterJid, newsletterName: botName, serverMessageId: 143 }
       }
     }, { quoted: mek });
-      await react("✅");
-  }
-);
-
-
-
-
-
-
+    await react("✅");
+});
 
 pmd({ 
   pattern: "uptime", 
-  react: "⏳",
+  react: "⏱️",
   category: "general",
   description: "check bot uptime status.",
 }, async (from, Popkid, conText) => {
-      const { mek, react, newsletterJid, botName } = conText;
-      
+    const { mek, react, newsletterJid, botName } = conText;
     const uptimeMs = Date.now() - BOT_START_TIME;
-    
-    const seconds = Math.floor((uptimeMs / 1000) % 60);
-    const minutes = Math.floor((uptimeMs / (1000 * 60)) % 60);
-    const hours = Math.floor((uptimeMs / (1000 * 60 * 60)) % 24);
-    const days = Math.floor(uptimeMs / (1000 * 60 * 60 * 24));
+    const s = Math.floor((uptimeMs / 1000) % 60), m = Math.floor((uptimeMs / (1000 * 60)) % 60), h = Math.floor((uptimeMs / (1000 * 60 * 60)) % 24), d = Math.floor(uptimeMs / (1000 * 60 * 60 * 24));
 
     await Popkid.sendMessage(from, {
-      text: `⏱️ Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s`,
+      text: `*🕒 ʀᴜɴ-ᴛɪᴍᴇ:* ${d}ᴅ ${h}ʜ ${m}ᴍ ${s}s`,
       contextInfo: {
         forwardingScore: 5,
         isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: newsletterJid,
-          newsletterName: botName,
-          serverMessageId: 143
-        }
+        forwardedNewsletterMessageInfo: { newsletterJid, newsletterName: botName, serverMessageId: 143 }
       }
     }, { quoted: mek });
-      await react("✅");
-  }
-);
+    await react("✅");
+});
 
 pmd({ 
   pattern: "repo", 
   aliases: ['sc', 'script'],
-  react: "💜",
+  react: "🎁",
   category: "general",
   description: "Fetch bot script.",
 }, async (from, Popkid, conText) => {
-      const { mek, sender, react, pushName, botPic, botName, ownerName, newsletterJid, popkidRepo } = conText;
-
+    const { mek, sender, react, pushName, botPic, botName, ownerName, newsletterJid, popkidRepo } = conText;
     const response = await axios.get(`https://api.github.com/repos/${popkidRepo}`);
-    const repoData = response.data;
-    const { full_name, name, forks_count, stargazers_count, created_at, updated_at, owner } = repoData;
-    const messageText = `Hello *_${pushName}_,*\nThis is *${botName},* A Whatsapp Bot Built by *${ownerName},* Enhanced with Amazing Features to Make Your Whatsapp Communication and Interaction Experience Amazing\n\n*ʀᴇᴘᴏ ʟɪɴᴋ:* https://github.com/${popkidRepo}\n\n*❲❒❳ ɴᴀᴍᴇ:* ${name}\n*❲❒❳ sᴛᴀʀs:* ${stargazers_count}\n*❲❒❳ ғᴏʀᴋs:* ${forks_count}\n*❲❒❳ ᴄʀᴇᴀᴛᴇᴅ ᴏɴ:* ${new Date(created_at).toLocaleDateString()}\n*❲❒❳ ʟᴀsᴛ ᴜᴘᴅᴀᴛᴇᴅ:* ${new Date(updated_at).toLocaleDateString()}`;
+    const { name, forks_count, stargazers_count, created_at, updated_at } = response.data;
+    
+    const messageText = `*Ｈｅｌｌｏ, ${pushName}!* 👋\n\n*${botName}* is active and ready. Built by *${ownerName}* for a seamless WhatsApp experience.\n\n╭───〔 *ʀᴇᴘᴏ sᴛᴀᴛs* 〕───┈\n│ 🌟 *sᴛᴀʀs:* ${stargazers_count}\n│ 🍴 *ғᴏʀᴋs:* ${forks_count}\n│ 📅 *ʙᴏʀɴ:* ${new Date(created_at).toLocaleDateString()}\n│ 🔄 *ᴜᴘᴅᴀᴛᴇ:* ${new Date(updated_at).toLocaleDateString()}\n╰──────────────────┈\n\n*🔗 ʟɪɴᴋ:* https://github.com/${popkidRepo}`;
 
-    const popkidMess = {
+    await Popkid.sendMessage(from, {
         image: { url: botPic },
         caption: messageText,
         contextInfo: {
           mentionedJid: [sender],
           forwardingScore: 5,
           isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: newsletterJid,
-            newsletterName: botName,
-            serverMessageId: 143
-          }
+          forwardedNewsletterMessageInfo: { newsletterJid, newsletterName: botName, serverMessageId: 143 }
         }
-      };
-      await Popkid.sendMessage(from, popkidMess, { quoted: mek });
-      await react("✅");
-  }
-);
-
+      }, { quoted: mek });
+      await react("💜");
+});
 
 pmd({
   pattern: "save",
   aliases: ['sv', 's', 'sav', '.'],
-  react: "⚡",
+  react: "💾",
   category: "tools",
   description: "Save messages (supports images, videos, audio, stickers, and text).",
 }, async (from, Popkid, conText) => {
   const { mek, reply, react, sender, isSuperUser, getMediaBuffer } = conText;
-  
-  if (!isSuperUser) {
-    return reply(`❌ Owner Only Command!`);
-  }
+  if (!isSuperUser) return reply(`*🚫 ACCESS DENIED!*`);
 
   const quotedMsg = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-  
-  if (!quotedMsg) {
-    return reply(`⚠️ Please reply to/quote a message.`);
-  }
+  if (!quotedMsg) return reply(`*⚠️ Please reply to a message.*`);
 
   try {
     let mediaData;
-    
     if (quotedMsg.imageMessage) {
-      const buffer = await getMediaBuffer(quotedMsg.imageMessage, "image");
-      mediaData = {
-        image: buffer,
-        caption: quotedMsg.imageMessage.caption || ""
-      };
-    } 
-    else if (quotedMsg.videoMessage) {
-      const buffer = await getMediaBuffer(quotedMsg.videoMessage, "video");
-      mediaData = {
-        video: buffer,
-        caption: quotedMsg.videoMessage.caption || ""
-      };
-    } 
-    else if (quotedMsg.audioMessage) {
-      const buffer = await getMediaBuffer(quotedMsg.audioMessage, "audio");
-      mediaData = {
-        audio: buffer,
-        mimetype: "audio/mp4"
-      };
-    } 
-    else if (quotedMsg.stickerMessage) {
-      const buffer = await getMediaBuffer(quotedMsg.stickerMessage, "sticker");
-      mediaData = {
-        sticker: buffer
-      };
-    } 
-    else if (quotedMsg.conversation || quotedMsg.extendedTextMessage?.text) {
-      const text = quotedMsg.conversation || quotedMsg.extendedTextMessage.text;
-      mediaData = {
-        text: text
-      };
-    } 
-    else {
-      return reply(`❌ Unsupported message type.`);
+      mediaData = { image: await getMediaBuffer(quotedMsg.imageMessage, "image"), caption: quotedMsg.imageMessage.caption || "" };
+    } else if (quotedMsg.videoMessage) {
+      mediaData = { video: await getMediaBuffer(quotedMsg.videoMessage, "video"), caption: quotedMsg.videoMessage.caption || "" };
+    } else if (quotedMsg.audioMessage) {
+      mediaData = { audio: await getMediaBuffer(quotedMsg.audioMessage, "audio"), mimetype: "audio/mp4" };
+    } else if (quotedMsg.stickerMessage) {
+      mediaData = { sticker: await getMediaBuffer(quotedMsg.stickerMessage, "sticker") };
+    } else if (quotedMsg.conversation || quotedMsg.extendedTextMessage?.text) {
+      mediaData = { text: quotedMsg.conversation || quotedMsg.extendedTextMessage.text };
+    } else {
+      return reply(`*❌ Type not supported.*`);
     }
 
     await Popkid.sendMessage(sender, mediaData, { quoted: mek });
-    // await reply(`✅ Saved Successfully!`);
     await react("✅");
-
   } catch (error) {
-    console.error("Save Error:", error);
-    await reply(`❌ Failed to save the message. Error: ${error.message}`);
+    await reply(`❌ Save Failed: ${error.message}`);
   }
 });
-
-
