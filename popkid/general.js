@@ -80,8 +80,8 @@ ${readmore}
   // 🎛 Category Formatter
   const formatCategory = (category, cmds) => {
     const title = `╭─⌬  *${category.toUpperCase()}*  ⌬─╮\n`;
-    const body = cmds.map(cmd => `│  ✦ ${botPrefix + cmd}`).join("\n");
-    const footer = `╰───────────────────────╯\n`;
+    const body = cmds.map(cmd => `│  🩷 ${botPrefix + cmd}`).join("\n");
+    const footer = `╰───────────────────╯\n`;
     return `${title}${body}\n${footer}`;
   };
 
