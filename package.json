@@ -51,7 +51,7 @@
     "sequelize": "*",
     "sharp": "^0.33.5",
     "yt-search": "^2.13.1",
-    "sqlite3": "*",
+    "sqlite3": "^5.1.6",
     "wa-sticker-formatter": "*"
   },
   "repository": {
