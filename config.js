@@ -39,10 +39,10 @@ module.exports = {
     AUTO_READ_MESSAGES : process.env.AUTO_READ_MESSAGES || 'false', // true/commands/false
     AUTO_BIO : process.env.AUTO_BIO || 'false',
     AUTO_BLOCK: process.env.AUTO_BLOCK || '212,233',
-    YT: process.env.YT || 'youtube.com/@pop_kid254',
+    YT: process.env.YT || 'youtube.com/@nick254',
     NEWSLETTER_JID: process.env.NEWSLETTER_JID || '120363423997837331@newsletter',
     NEWSLETTER_URL: process.env.NEWSLETTER_URL || 'https://whatsapp.com/channel/0029Vb70ySJHbFV91PNKuL3T',
-    BOT_REPO: process.env.BOT_REPO || 'popkidc/POPKID-XD',
+    BOT_REPO: process.env.BOT_REPO || 'nickxd254/NICK-XMD',
     PACK_NAME: process.env.PACK_NAME || '𝐏𝐎𝐏𝐊𝐈𝐃 𝐗𝐓𝐑',
     PACK_AUTHOR: process.env.PACK_AUTHOR || '𝐏𝐎𝐏𝐊𝐈𝐃'
 };
