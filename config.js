@@ -13,7 +13,7 @@ module.exports = {
     FOOTER : process.env.FOOTER || 'NICK XMD BOT',
     CAPTION : process.env.CAPTION || 'NICK XMD',
     VERSION: process.env.VERSION || '5.0.0',
-    BOT_PIC : process.env.BOT_PIC || 'https://i.ibb.co/fTCrW08/373b5c2300fc0f90e39b3797f2db358b.jpg',            
+    BOT_PIC : process.env.BOT_PIC || 'https://files.catbox.moe/z1zugu.jpg',            
     MODE: process.env.MODE || "private",
     PM_PERMIT: process.env.PM_PERMIT || 'false',
     WARN_COUNT : process.env.WARN_COUNT || '3' ,
@@ -43,7 +43,7 @@ module.exports = {
     NEWSLETTER_JID: process.env.NEWSLETTER_JID || '120363423997837331@newsletter',
     NEWSLETTER_URL: process.env.NEWSLETTER_URL || 'https://whatsapp.com/channel/0029Vb70ySJHbFV91PNKuL3T',
     BOT_REPO: process.env.BOT_REPO || 'nickxd254/NICK-XMD',
-    PACK_NAME: process.env.PACK_NAME || '𝐏𝐎𝐏𝐊𝐈𝐃 𝐗𝐓𝐑',
+    PACK_NAME: process.env.PACK_NAME || 'NICK',
     PACK_AUTHOR: process.env.PACK_AUTHOR || '𝐏𝐎𝐏𝐊𝐈𝐃'
 };
 
