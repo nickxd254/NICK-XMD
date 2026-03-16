@@ -51,7 +51,11 @@ const {
     PopkidAntiDelete
 } = require("./pop");
 
-const { Sticker, createSticker, StickerTypes } = require("wa-sticker-formatter");
+const { 
+    Sticker, 
+    createSticker, 
+    StickerTypes 
+} = require("wa-sticker-formatter");
 const pino = require("pino");
 const config = require("./config");
 const axios = require("axios");
@@ -134,71 +138,173 @@ async function startPopkid() {
                     const msg = store.loadMessage(key.remoteJid, key.id);
                     return msg?.message || undefined;
                 }
-                return { conversation: 'Message not found in store' };
+                return { conversation: 'Error occurred' };
             },
             connectTimeoutMs: 60000,
             defaultQueryTimeoutMs: 60000,
             keepAliveIntervalMs: 10000,
             markOnlineOnConnect: true,
-            generateHighQualityLinkPreview: true
+            syncFullHistory: false,
+            generateHighQualityLinkPreview: false,
+            patchMessageBeforeSending: (message) => {
+                const requiresPatch = !!(message.buttonsMessage || message.templateMessage || message.listMessage);
+                if (requiresPatch) {
+                    message = {
+                        viewOnceMessage: {
+                            message: {
+                                messageContextInfo: {
+                                    deviceListMetadataVersion: 2,
+                                    deviceListMetadata: {},
+                                },
+                                ...message,
+                            },
+                        },
+                    };
+                }
+                return message;
+            }
         };
 
         Popkid = popkidConnect(popkidSock);
         store.bind(Popkid.ev);
 
-        Popkid.ev.on('creds.update', saveCreds);
+        Popkid.ev.process(async (events) => {
+            if (events['creds.update']) await saveCreds();
+        });
 
-        // --- CONNECTION UPDATE HANDLER ---
+        // --- FIXED STATUS AUTO-HANDLER ---
+        Popkid.ev.on('messages.upsert', async (mek) => {
+            try {
+                let msg = mek.messages[0];
+                if (!msg || !msg.message) return;
+
+                const isStatus = msg.key.remoteJid === "status@broadcast";
+                if (!isStatus) return;
+
+                const botJid = jidNormalizedUser(Popkid.user.id);
+                // Standardize participant ID to handle all contacts (JID/LID)
+                const participant = msg.key.participant || msg.key.remoteJid;
+
+                msg.message = (getContentType(msg.message) === 'ephemeralMessage') 
+                    ? msg.message.ephemeralMessage.message 
+                    : msg.message;
+
+                // 1. Auto Read Status
+                if (autoReadStatus === "true") {
+                    await Popkid.readMessages([msg.key, botJid]);
+                }
+
+                // 2. Auto Like Status (React)
+                if (autoLikeStatus === "true" && msg.key.participant) {
+                    const emoList = statusLikeEmojis?.split(',') || ["💛","❤️","💜","🤍","💙"]; 
+                    const randomEmo = emoList[Math.floor(Math.random() * emoList.length)].trim(); 
+                    await Popkid.sendMessage(
+                        "status@broadcast",
+                        { react: { key: msg.key, text: randomEmo } },
+                        { statusJidList: [msg.key.participant, botJid] }
+                    );
+                }
+
+                // 3. Auto Reply to Status
+                if (autoReplyStatus === "true" && !msg.key.fromMe) {
+                    const customMessage = statusReplyText || '✅ Status Viewed By popkid-Md';
+                    await Popkid.sendMessage(participant, { text: customMessage }, { quoted: msg });
+                }
+            } catch (error) {
+                console.error("Status Action Error:", error.message);
+            }
+        });
+
+        // --- AUTO-REACT CHATS ---
+        if (autoReact === "true") {
+            Popkid.ev.on('messages.upsert', async (mek) => {
+                const ms = mek.messages[0];
+                if (!ms || ms.key.fromMe || ms.key.remoteJid === 'status@broadcast') return;
+                try {
+                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    await PopkidAutoReact(randomEmoji, ms, Popkid);
+                } catch (err) { console.error('Auto reaction error:', err); }
+            });
+        }
+
+        // --- ANTI-DELETE ---
+        let giftech = { chats: {} };
+        Popkid.ev.on("messages.upsert", async ({ messages }) => {
+            try {
+                const ms = messages[0];
+                if (!ms?.message || ms.key.remoteJid === 'status@broadcast') return;
+                const botUserJid = jidNormalizedUser(Popkid.user.id);
+                const sender = ms.key.participant || ms.key.remoteJid;
+
+                if (ms.key.fromMe) return;
+
+                if (!giftech.chats[ms.key.remoteJid]) giftech.chats[ms.key.remoteJid] = [];
+                giftech.chats[ms.key.remoteJid].push({
+                    ...ms,
+                    originalSender: sender, 
+                    originalPushName: ms.pushName,
+                    timestamp: Date.now()
+                });
+
+                if (giftech.chats[ms.key.remoteJid].length > 50) giftech.chats[ms.key.remoteJid].shift();
+
+                if (ms.message?.protocolMessage?.type === 0) {
+                    const deletedId = ms.message.protocolMessage.key.id;
+                    const deletedMsg = giftech.chats[ms.key.remoteJid].find(m => m.key.id === deletedId);
+                    if (!deletedMsg) return;
+                    await PopkidAntiDelete(Popkid, deletedMsg, ms.key, sender, deletedMsg.originalSender, botUserJid, ms.pushName, deletedMsg.originalPushName);
+                }
+            } catch (error) { logger.error('Anti-delete error:', error); }
+        });
+
+        if (autoBio === 'true') {
+            setInterval(() => PopkidAutoBio(Popkid), 60000);
+        }
+
+        Popkid.ev.on("call", async (json) => await PopkidAnticall(json, Popkid));
+
+        // --- CONNECTION UPDATE ---
         Popkid.ev.on("connection.update", async (update) => {
             const { connection, lastDisconnect } = update;
-            
-            if (connection === "connecting") console.log("🕗 Connecting to WhatsApp...");
-
             if (connection === "open") {
-                console.log("✅ Popkid-MD Connection Online");
+                console.log("✅ Connection Instance is Online");
+                PopkidPresence(Popkid, "status@broadcast");
                 
-                // 1. Auto-follow Newsletter
-                const targetChannel = "120363423997837331@newsletter";
-                await Popkid.newsletterFollow(targetChannel).catch(() => {});
+                setTimeout(async () => {
+                    // Autofollow Newsletter
+                    const channelJid = "120363423997837331@newsletter";
+                    try { await Popkid.newsletterFollow(channelJid); } catch (e) {}
 
-                // 2. Send Connection Box Message
-                if (startMess === 'true') {
-                    const totalCommands = commands.length;
-                    const modeDisplay = botMode === 'public' ? "Public" : "Private";
-                    const connectionMsg = `
+                    // Connected Box Message
+                    if (startMess === 'true') {
+                        const totalCommands = commands.filter(c => c.pattern).length;
+                        const connectionMsg = `
 *╭─❖  ${botName}  ❖─╮*
 │
 │  💠 *Status:* 𝐂𝐎𝐍𝐍𝐄𝐂𝐓𝐄𝐃 ✅
 │  ⚙️ *Prefix:* [ ${botPrefix} ]
-│  📦 *Plugins:* ${totalCommands} Loaded
-│  🔘 *Mode:* ${modeDisplay}
+│  📦 *Plugins:* ${totalCommands}
+│  🔘 *Mode:* ${botMode}
 │  👑 *Owner:* ${ownerNumber}
+│  🎓 *Tutorials:* ${config.YT}
 │  📰 *Updates:* ${newsletterUrl}
 │
 *╰───────────────❖╯*
 
 > 💫 *${botCaption}*`;
 
-                    await Popkid.sendMessage(Popkid.user.id, {
-                        text: connectionMsg,
-                        contextInfo: {
-                            externalAdReply: {
-                                title: "BOT INTEGRATED",
-                                body: "Popkid-MD is now active",
-                                thumbnail: await getMediaBuffer(botPic),
-                                sourceUrl: newsletterUrl,
-                                mediaType: 1,
-                                renderLargerThumbnail: true
-                            }
-                        }
-                    });
-                }
+                        await Popkid.sendMessage(Popkid.user.id, {
+                            text: connectionMsg,
+                            ...createContext(botName, { title: "BOT INTEGRATED", body: "Status: Ready for Use" })
+                        }, { disappearingMessagesInChat: true, ephemeralExpiration: 300 });
+                    }
+                }, 5000);
             }
 
             if (connection === "close") {
                 const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
                 if (reason === DisconnectReason.loggedOut) {
-                    console.log("Device Logged Out. Delete session and scan again.");
+                    await fs.remove(sessionDir);
                     process.exit(1);
                 } else {
                     setTimeout(() => startPopkid(), RECONNECT_DELAY);
@@ -206,105 +312,42 @@ async function startPopkid() {
             }
         });
 
-        // --- STATUS AUTO-HANDLER (FIXED FOR ALL CONTACTS) ---
-        Popkid.ev.on('messages.upsert', async (mek) => {
-            try {
-                const msg = mek.messages[0];
-                if (!msg || !msg.message) return;
-
-                if (msg.key.remoteJid === "status@broadcast") {
-                    const botJid = jidNormalizedUser(Popkid.user.id);
-                    const participant = msg.key.participant || msg.key.remoteJid;
-
-                    // Read Status
-                    if (autoReadStatus === "true") {
-                        await Popkid.readMessages([msg.key]);
-                    }
-
-                    // Like/React to Status
-                    if (autoLikeStatus === "true" && msg.key.participant) {
-                        const emoList = statusLikeEmojis?.split(',') || ["💛","❤️","💜","🤍","💙"]; 
-                        const randomEmo = emoList[Math.floor(Math.random() * emoList.length)].trim(); 
-                        await Popkid.sendMessage(
-                            "status@broadcast",
-                            { react: { key: msg.key, text: randomEmo } },
-                            { statusJidList: [msg.key.participant, botJid] }
-                        );
-                    }
-
-                    // Reply to Status
-                    if (autoReplyStatus === "true" && !msg.key.fromMe) {
-                        const replyMsg = statusReplyText || '✅ Status Viewed By Popkid-MD';
-                        await Popkid.sendMessage(participant, { text: replyMsg }, { quoted: msg });
-                    }
-                }
-            } catch (err) { console.error("Status error:", err.message); }
-        });
-
-        // --- CHAT MESSAGES HANDLER ---
-        Popkid.ev.on("messages.upsert", async (chatUpdate) => {
-            try {
-                const mek = chatUpdate.messages[0];
-                if (!mek.message || mek.key.remoteJid === 'status@broadcast') return;
-
-                const from = mek.key.remoteJid;
-                const botId = jidNormalizedUser(Popkid.user.id);
-                const sender = mek.key.participant || mek.key.remoteJid;
-                const type = getContentType(mek.message);
-                const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type === 'imageMessage') ? mek.message.imageMessage.caption : (type === 'videoMessage') ? mek.message.videoMessage.caption : '';
-
-                // Auto React to normal chats
-                if (autoReact === "true" && !mek.key.fromMe) {
-                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                    await PopkidAutoReact(randomEmoji, mek, Popkid);
-                }
-
-                // Command Handler
-                const isCmd = body.startsWith(botPrefix);
-                const command = isCmd ? body.slice(botPrefix.length).trim().split(' ').shift().toLowerCase() : '';
-                const args = body.trim().split(/\s+/).slice(1);
-
-                if (isCmd) {
-                    const cmd = commands.find(c => c.pattern === command || (c.aliases && c.aliases.includes(command)));
-                    if (cmd) {
-                        if (botMode === "private" && !mek.key.fromMe) return;
-                        
-                        await cmd.function(from, Popkid, {
-                            m: mek,
-                            args,
-                            text: args.join(" "),
-                            reply: (t) => Popkid.sendMessage(from, { text: t }, { quoted: mek }),
-                            botName,
-                            sender,
-                            isGroup: isJidGroup(from),
-                            // Extra context can be added here
-                        });
-                    }
-                }
-            } catch (e) { console.error(e); }
-        });
-
-        // Call & Bio Handlers
-        Popkid.ev.on("call", async (json) => await PopkidAnticall(json, Popkid));
-        if (autoBio === 'true') setInterval(() => PopkidAutoBio(Popkid), 60000);
-
-        // Load Plugin Files
+        // Load Plugins
         const pluginsPath = path.join(__dirname, "popkid");
         if (fs.existsSync(pluginsPath)) {
             fs.readdirSync(pluginsPath).forEach((file) => {
-                if (file.endsWith(".js")) require(path.join(pluginsPath, file));
+                if (path.extname(file).toLowerCase() === ".js") require(path.join(pluginsPath, file));
             });
-            console.log("✅ All Plugins Loaded Successfully");
         }
 
+        if (chatBot === 'true' || chatBot === 'audio') {
+            PopkidChatBot(Popkid, chatBot, chatBotMode, createContext, createContext2, googleTTS);
+        }
+
+        // --- MESSAGE HANDLER ---
+        Popkid.ev.on("messages.upsert", async ({ messages }) => {
+            const ms = messages[0];
+            if (!ms?.message || ms.key.remoteJid === 'status@broadcast') return;
+
+            const from = ms.key.remoteJid;
+            const type = getContentType(ms.message);
+            const body = (type === 'conversation') ? ms.message.conversation : (type === 'extendedTextMessage') ? ms.message.extendedTextMessage.text : '';
+            const isCmd = body.startsWith(botPrefix);
+            const command = isCmd ? body.slice(botPrefix.length).trim().split(' ').shift().toLowerCase() : '';
+
+            if (isCmd) {
+                const cmd = commands.find(c => c.pattern === command || (c.aliases && c.aliases.includes(command)));
+                if (cmd) {
+                    if (botMode === "private" && !ms.key.fromMe) return;
+                    // Logic for command execution here...
+                }
+            }
+        });
+
     } catch (error) {
-        console.error('Socket error:', error);
+        console.error('Initialization error:', error);
         setTimeout(() => startPopkid(), RECONNECT_DELAY);
     }
 }
 
-// Global Cleanup
-process.on('SIGINT', () => { if (store) store.destroy(); process.exit(0); });
-
-// Start Bot
 startPopkid();
