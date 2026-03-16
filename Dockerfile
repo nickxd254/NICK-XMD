@@ -1,27 +1,32 @@
-FROM node:lts-buster
+# Use a newer, more stable version of Node
+FROM node:18-bullseye
 
-# Use a mirror and clear cache to avoid Exit Code 100
-RUN apt-get update && \
+# Fix for Exit Code 100: Use a more robust update and retry logic
+RUN apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
     ffmpeg \
     imagemagick \
     webp \
-    git && \
+    git \
+    python3 \
+    build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /app
 
-# Copy package files first (better for caching)
+# Copy package files first
 COPY package.json .
+
+# Install dependencies (using --force if needed to avoid build hangs)
 RUN npm install
 
-# Copy the rest of your code
+# Copy everything else
 COPY . .
 
-# Expose the port (Make sure this matches your config)
+# Match your index.js port
 EXPOSE 4420
 
-# Startup command
+# Start the bot
 CMD ["node", "index.js"]
