@@ -1,32 +1,30 @@
-# Use a newer, more stable version of Node
-FROM node:18-bullseye
+# Use Node 20 (LTS) which has built-in Web Crypto support
+FROM node:20-bullseye
 
-# Fix for Exit Code 100: Use a more robust update and retry logic
+# Install system dependencies
 RUN apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
     ffmpeg \
     imagemagick \
     webp \
-    git \
-    python3 \
-    build-essential && \
+    git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /app
 
-# Copy package files first
+# Copy package files
 COPY package.json .
 
-# Install dependencies (using --force if needed to avoid build hangs)
+# Install dependencies
 RUN npm install
 
-# Copy everything else
+# Copy the rest of the code
 COPY . .
 
-# Match your index.js port
+# Match your port config
 EXPOSE 4420
 
-# Start the bot
+# Command to run the bot
 CMD ["node", "index.js"]
