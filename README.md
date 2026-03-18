@@ -63,11 +63,11 @@ Use one of the options above:
 
 ---
 
-## 🧑‍💻 THANKS TO POPKID 
+## 🧑‍💻 THANKS TO POPKID
 
 ## THANKS TO GOD ❤️❤️❤️
 
----
+--- BY GRACE 👌💫
 
 ## ⭐ Support
 Give the repo a star ⭐ if you like it!
