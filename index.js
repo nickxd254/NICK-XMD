@@ -111,7 +111,7 @@ async function start() {
                     // --- SUCCESS NOTIFICATION (Maintained) ---
                     const myId = jidNormalizedUser(Matrix.user.id);
                     await Matrix.sendMessage(myId, { 
-                        image: { url: "https://files.catbox.moe/kiy0hl.jpg" }, 
+                        image: { url: "https://files.catbox.moe/pmc3rs.jpeg" }, 
                         caption: `\n\n*NICK-XD ONLINE*\n\n╔════════════════╗\n║ 🤖 STATUS: ACTIVE\n╠════════════════╣\n║ 🔑 PREFIX : ${config.PREFIX}\n║ 👨‍💻 USER : ${Matrix.user.name || 'Developer'}\n╚════════════════╝`
                     });
                     initialConnection = false;
