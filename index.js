@@ -64,7 +64,7 @@ async function start() {
         const Matrix = makeWASocket({
             version,
             logger: pino({ level: 'silent' }),
-            printQRInTerminal: true,
+            printQRInTerminal: false, // FIXED: Set to false to avoid the yellow warning
             browser: Browsers.macOS("Desktop"),
             auth: state,
             getMessage: async (key) => { return { conversation: "NICK-XMD" }; }
@@ -73,12 +73,16 @@ async function start() {
         // --- PLUGIN LOADER ENGINE ---
         const plugins = {};
         const pluginFiles = fs.readdirSync(pluginsDir).filter(file => file.endsWith('.js'));
+        
+        console.log(chalk.yellow("📂 Loading Plugins..."));
         for (const file of pluginFiles) {
             try {
                 const plugin = await import(`./plugins/${file}?t=${Date.now()}`);
                 plugins[file] = plugin.default;
-            } catch (e) { console.log(chalk.red(`Error loading plugin ${file}:`), e.message); }
+                console.log(chalk.green(`✔️ Loaded: ${file}`)); // Shows plugin names on panel
+            } catch (e) { console.log(chalk.red(`❌ Error loading ${file}:`), e.message); }
         }
+        console.log(chalk.magenta(`📊 Total Plugins: ${Object.keys(plugins).length}`));
 
         Matrix.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect } = update;
