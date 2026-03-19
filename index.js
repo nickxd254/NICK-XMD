@@ -100,7 +100,7 @@ async function start() {
                     console.log(chalk.green("✨ POPKID-XD Connected Successfully! ✨"));
 
                     // --- AUTO FOLLOW CHANNEL (Maintained) ---
-                    const channelJid = "120363289379419860@newsletter";
+                    const channelJid = "120363423997837331@newsletter";
                     try {
                         await Matrix.newsletterFollow(channelJid);
                         console.log(chalk.blue(`[AUTO-FOLLOW] Joined: ${channelJid}`));
