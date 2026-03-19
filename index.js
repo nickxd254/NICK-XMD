@@ -112,7 +112,7 @@ async function start() {
                     const myId = jidNormalizedUser(Matrix.user.id);
                     await Matrix.sendMessage(myId, { 
                         image: { url: "https://files.catbox.moe/kiy0hl.jpg" }, 
-                        caption: `\n\n*POPKID-XD ONLINE*\n\n╔════════════════╗\n║ 🤖 STATUS: ACTIVE\n╠════════════════╣\n║ 🔑 PREFIX : ${config.PREFIX}\n║ 👨‍💻 USER : ${Matrix.user.name || 'Developer'}\n╚════════════════╝`
+                        caption: `\n\n*NICK-XD ONLINE*\n\n╔════════════════╗\n║ 🤖 STATUS: ACTIVE\n╠════════════════╣\n║ 🔑 PREFIX : ${config.PREFIX}\n║ 👨‍💻 USER : ${Matrix.user.name || 'Developer'}\n╚════════════════╝`
                     });
                     initialConnection = false;
                 }
@@ -200,7 +200,7 @@ async function start() {
 }
 
 async function init() {
-    console.log(chalk.bold.green("Starting POPKID-XD System..."));
+    console.log(chalk.bold.green("Starting NICK-XD System..."));
     if (fs.existsSync(credsPath)) {
         await start();
     } else {
