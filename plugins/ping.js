@@ -1,20 +1,71 @@
-export default async function(Matrix, m, { command, isCmd, from }) {
-    // 1. Only respond if the command is exactly 'ping'
-    if (command !== 'ping') return;
+import axios from 'axios';
+import fs from 'fs';
+import os from 'os';
+import config from '../config.cjs';
 
-    // 2. Start the timer
+const pingCmd = async (m, Matrix) => {
+  const prefix = config.PREFIX;
+  const body = m.body || "";
+  const cmd = body.startsWith(prefix) 
+    ? body.slice(prefix.length).split(" ")[0].toLowerCase() 
+    : "";
+
+  if (cmd !== "ping") return;
+
+  try {
     const start = Date.now();
+    
+    // Function to fetch image exactly like your menu script
+    const getMenuImage = async () => {
+      if (config.MENU_IMAGE && config.MENU_IMAGE.trim() !== '') {
+        try {
+          const response = await axios.get(config.MENU_IMAGE, { responseType: 'arraybuffer' });
+          return Buffer.from(response.data, 'binary');
+        } catch (error) {
+          return fs.readFileSync('./media/zenor.jpeg');
+        }
+      } else {
+        return fs.readFileSync('./media/zenor.jpeg');
+      }
+    };
 
-    // 3. Send an initial message
-    const { key } = await Matrix.sendMessage(from, { text: '🚀 *Checking Speed...*' }, { quoted: m });
+    const menuImage = await getMenuImage();
+    const latency = Date.now() - start;
 
-    // 4. Calculate the difference
-    const end = Date.now();
-    const responseTime = end - start;
+    // Stylish Text Content
+    const pingStatus = `*ᴘᴏᴘᴋɪᴅ xᴍᴅ sᴛᴀᴛᴜs*\n\n` +
+                       `🚀 *ʟᴀᴛᴇɴᴄʏ:* ${latency}ᴍs\n` +
+                       `💻 *ᴘʟᴀᴛꜰᴏʀᴍ:* ${os.platform()}\n` +
+                       `⚙️ *ᴜᴘᴛɪᴍᴇ:* ${Math.floor(process.uptime() / 60)} ᴍɪɴᴜᴛᴇs\n\n` +
+                       `_ᴘᴏᴘᴋɪᴅ ʙᴏᴛ ɪs ᴏᴘᴇʀᴀᴛɪᴏɴᴀʟ_`;
 
-    // 5. Update the message with the final result
-    await Matrix.sendMessage(from, { 
-        text: `*NICK-XMD RESPONSE* ⚡\n\nSpeed: ${responseTime}ms\nStatus: Online ✅`,
-        edit: key 
+    await Matrix.sendMessage(m.from, {
+      image: menuImage,
+      caption: pingStatus,
+      contextInfo: {
+        mentionedJid: [m.sender],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+          newsletterJid: '120363289379419860@newsletter',
+          newsletterName: "ᴘᴏᴘᴋɪᴅ ᴜᴘᴅᴀᴛᴇs",
+          serverMessageId: 143
+        },
+        externalAdReply: {
+          title: "ᴘᴏᴘᴋɪᴅ xᴍᴅ ᴏꜰꜰɪᴄɪᴀʟ",
+          body: "sʏsᴛᴇᴍ ᴘᴇʀꜰᴏʀᴍᴀɴᴄᴇ ᴄʜᴇᴄᴋ",
+          thumbnailUrl: "https://files.catbox.moe/yr339d.jpg",
+          sourceUrl: "https://whatsapp.com/channel/0029VacgxK96hENmSRMRxx1r",
+          mediaType: 1,
+          renderLargerThumbnail: false
+        }
+      }
     }, { quoted: m });
-}
+
+  } catch (error) {
+    console.error("PING ERROR:", error);
+    m.reply("⚠️ *Error:* System check failed.");
+  }
+};
+
+export default pingCmd;
