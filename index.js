@@ -32,7 +32,7 @@ const app = express()
 const port = process.env.PORT || 9090
 const sessionDir = path.join(__dirname, 'sessions')
 const credsPath = path.join(sessionDir, 'creds.json')
-const ownerNumber = ['254732297194'] 
+const ownerNumber = ['254706360341'] 
 
 let conn 
 
