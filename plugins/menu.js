@@ -11,10 +11,24 @@ cmd({
 },
 async (conn, mek, m, { from, pushname, reply }) => {
     try {
-        let menu = `✨ *𝗡𝗜𝗖𝗞-𝗫𝗠𝗗 𝗖𝗢𝗠𝗠𝗔𝗡𝗗 𝗟𝗜𝗦𝗧* ✨\n\n`;
-        menu += `👤 *User:* ${pushname}\n`;
-        menu += `🕒 *Uptime:* ${runtime(process.uptime())}\n`;
-        menu += `━━━━━━━━━━━━━━━\n`;
+
+        const totalCommands = commands.length;
+        const totalCategories = [...new Set(commands.map(c => c.category))].length;
+        const date = new Date().toLocaleDateString();
+        const time = new Date().toLocaleTimeString();
+
+        let menu = `
+╭━━━〔 *NICK-XMD SYSTEM* 〕━━━⬣
+┃ 👤 *User:* ${pushname}
+┃ ⚡ *Mode:* Public
+┃ 🧠 *Commands:* ${totalCommands}
+┃ 📂 *Categories:* ${totalCategories}
+┃ 🕒 *Uptime:* ${runtime(process.uptime())}
+┃ 📅 *Date:* ${date}
+┃ ⏰ *Time:* ${time}
+╰━━━━━━━━━━━━━━━━━━⬣
+
+╭━━━〔 *COMMAND PANEL* 〕━━━⬣`;
 
         const categories = {};
         commands.forEach(command => {
@@ -23,16 +37,27 @@ async (conn, mek, m, { from, pushname, reply }) => {
         });
 
         for (const category in categories) {
-            menu += `\n*◈ ${category.toUpperCase()} ◈*\n`;
-            menu += categories[category].map(cmd => `  ↳ .${cmd}`).join('\n') + '\n';
+            menu += `
+
+┃ ◈ *${category.toUpperCase()}*
+┃ ───────────────`;
+
+            menu += '\n' + categories[category]
+                .map(cmd => `┃ ➤ .${cmd}`)
+                .join('\n');
         }
 
-        menu += `\n━━━━━━━━━━━━━━━\n_Powered by Popkid Tech_`;
+        menu += `
+
+╰━━━━━━━━━━━━━━━━━━⬣
+✨ *Fast • Clean • Powerful*
+🚀 _Powered by Popkid Tech_`;
 
         await conn.sendMessage(from, { 
             image: { url: "https://files.catbox.moe/4audtn.png" }, 
             caption: menu 
         }, { quoted: mek });
+
     } catch (e) {
         reply(`Error: ${e}`);
     }
