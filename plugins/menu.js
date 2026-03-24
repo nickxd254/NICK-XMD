@@ -30,7 +30,7 @@ async (conn, mek, m, { from, pushname, reply }) => {
         menu += `\n━━━━━━━━━━━━━━━\n_Powered by Popkid Tech_`;
 
         await conn.sendMessage(from, { 
-            image: { url: "https://files.catbox.moe/j9ia5c.png" }, 
+            image: { url: "https://files.catbox.moe/4audtn.png" }, 
             caption: menu 
         }, { quoted: mek });
     } catch (e) {
