@@ -121,7 +121,7 @@ async function connectToWA() {
             })
 
             let up = `╔══════════════════╗\n║ 🤖 𝗡𝗜𝗖𝗞-𝗫𝗠𝗗 𝗩𝟭 𝗢𝗡𝗟𝗜𝗡𝗘\n╠══════════════════╣\n║ 👤 OWNER : NICK\n║ 🔑 PREFIX : ${config.PREFIX}\n║ 🕒 UPTIME : ${runtime(process.uptime())}\n╚══════════════════╝`;
-            await conn.sendMessage(conn.user.id, { image: { url: `https://files.catbox.moe/j9ia5c.png` }, caption: up })
+            await conn.sendMessage(conn.user.id, { image: { url: `https://files.catbox.moe/4audtn.png` }, caption: up })
         }
     })
 
