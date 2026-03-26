@@ -4,7 +4,7 @@
   
 <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=00FFCC&center=true&vCenter=true&width=435&lines=The+Ultimate+WhatsApp+Bot;Created+by+Popkid;Powered+by+Kenyan+Innovation;Fast+•+Reliable+•+Powerful" alt="Typing SVG" />
 
-[![Stars](https://img.shields.io/github/stars/popkidmd/POPKID-XMD?style=for-the-badge&color=FFD700&logo=github)](https://github.com/nickxd254/NICK-XMD)
+[![Stars](https://img.shields.io/github/stars/nickxd254/NICK-XMD?style=for-the-badge&color=FFD700&logo=github)](https://github.com/nickxd254/NICK-XMD)
 [![Forks](https://img.shields.io/github/forks/nickxd254/NICK-XMD?style=for-the-badge&color=00FFCC&logo=github-sponsors)](https://github.com/nickxd254/NICK-XMD/network/members)
 [![Owner](https://img.shields.io/badge/OWNER-POPKID-blue?style=for-the-badge&logo=probot&logoColor=white)](https://github.com/nickxd254)
 
