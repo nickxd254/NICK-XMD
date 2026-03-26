@@ -4,9 +4,9 @@
   
 <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=00FFCC&center=true&vCenter=true&width=435&lines=The+Ultimate+WhatsApp+Bot;Created+by+Popkid;Powered+by+Kenyan+Innovation;Fast+•+Reliable+•+Powerful" alt="Typing SVG" />
 
-[![Stars](https://img.shields.io/github/stars/popkidmd/POPKID-XMD?style=for-the-badge&color=FFD700&logo=github)](https://github.com/popkidmd/POPKID-XMD)
-[![Forks](https://img.shields.io/github/forks/popkidmd/POPKID-XMD?style=for-the-badge&color=00FFCC&logo=github-sponsors)](https://github.com/popkidmd/POPKID-XMD/network/members)
-[![Owner](https://img.shields.io/badge/OWNER-POPKID-blue?style=for-the-badge&logo=probot&logoColor=white)](https://github.com/popkidmd)
+[![Stars](https://img.shields.io/github/stars/popkidmd/POPKID-XMD?style=for-the-badge&color=FFD700&logo=github)](https://github.com/nickxd254/NICK-XMD)
+[![Forks](https://img.shields.io/github/forks/nickxd254/NICK-XMD?style=for-the-badge&color=00FFCC&logo=github-sponsors)](https://github.com/nickxd254/NICK-XMD/network/members)
+[![Owner](https://img.shields.io/badge/OWNER-POPKID-blue?style=for-the-badge&logo=probot&logoColor=white)](https://github.com/nickxd254)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%">
@@ -21,7 +21,7 @@ To get started, scan your session ID using the link below:
   
 | **Scan QR / Pair Code** | **Deploy to Heroku** |
 |:---:|:---:|
-| [![Session ID](https://img.shields.io/badge/GET_SESSION_ID-FF0055?style=for-the-badge&logo=render&logoColor=white)](https://popkidxmdscanninglink.onrender.com/) | [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https://github.com/popkidmd/POPKID-XMD) |
+| [![Session ID](https://img.shields.io/badge/GET_SESSION_ID-FF0055?style=for-the-badge&logo=render&logoColor=white)](https://popkidxmdscanninglink.onrender.com/) | [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https://github.com/nickxd254/NICK-XMD) |
 
 </div>
 
