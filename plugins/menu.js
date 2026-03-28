@@ -5,93 +5,83 @@ const path = require('path');
 const moment = require('moment-timezone');
 const { cmd, commands } = require('../command');
 
-// --- PRE-LOAD IMAGE TO STOP LAG ---
-const menuImagePath = path.resolve('./popkid/menu.jpg');
-let menuImageBuffer = null;
-try {
-    menuImageBuffer = fs.readFileSync(menuImagePath);
-} catch (e) {
-    console.log("Menu image not found, will send text only.");
-}
-
-// Helpers
-const monospace = (text) => `\`${text}\``;
+// Helper: Formats bytes to MB/GB
 const formatSize = (bytes) => {
     if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + 'GB';
     return (bytes / 1048576).toFixed(1) + 'MB';
 };
+
+// Helper: Simple Uptime
 const formatUptime = (seconds) => {
-    const d = Math.floor(seconds / (24 * 3600));
-    const h = Math.floor((seconds % (24 * 3600)) / 3600);
+    const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
-    return `${d}d ${h}h ${m}m ${s}s`;
+    return `${h}h ${m}m ${s}s`;
 };
 
 cmd({
     pattern: 'menu',
-    alias: ['help', 'allmenu'],
-    react: '✅',
+    alias: ['help', 'allmenu', 'list'],
+    react: '📜',
     category: 'main',
     filename: __filename,
-    desc: 'Show optimized main menu'
-}, async (conn, mek, m, { from, sender, pushName, reply }) => {
+    desc: 'Show NICK-XMD Main Menu'
+}, async (conn, mek, m, { from, pushName, reply }) => {
     try {
         const timeZone = 'Africa/Nairobi';
-        const time = moment.tz(timeZone).format('hh:mm:ss A');
         const date = moment.tz(timeZone).format('DD/MM/YYYY');
+        const time = moment.tz(timeZone).format('HH:mm:ss');
         const uptime = formatUptime(process.uptime());
-        const ram = `${formatSize(os.totalmem() - os.freemem())}/${formatSize(os.totalmem())}`;
-        const mode = (config.MODE === 'public') ? 'PUBLIC' : 'PRIVATE';
-        const userName = pushName || 'User';
-
-        // Filter and Group Commands
-        const commandsByCategory = {};
-        let totalCommands = 0;
+        const ram = `${formatSize(os.totalmem() - os.freemem())} / ${formatSize(os.totalmem())}`;
+        
+        // Group Commands by Category
+        const categories = {};
         commands.forEach(command => {
-            if (command.pattern && !command.dontAdd && command.category) {
+            if (!command.dontAdd && command.category && command.pattern) {
                 const cat = command.category.toUpperCase();
-                if (!commandsByCategory[cat]) commandsByCategory[cat] = [];
-                commandsByCategory[cat].push(command.pattern.split('|')[0]);
-                totalCommands++;
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(command.pattern);
             }
         });
 
-        // Construct Menu String
-        let menu = `╭══〘 *${monospace(config.BOT_NAME || 'POP KID-MD')}* 〙══⊷
-┃❤️ *Mode:* ${monospace(mode)}
-┃🤗 *User:* ${monospace(userName)}
-┃✅ *Plugins:* ${monospace(totalCommands)}
-┃🫥 *Uptime:* ${monospace(uptime)}
-┃❤️ *Date:* ${monospace(date)}
-┃😘 *RAM:* ${monospace(ram)}
-┃⭐ *Ping:* ${monospace(Math.floor(Math.random() * 50) + 10 + 'ms')}
-╰═════════════════⊷
+        // Construct Header
+        let menuText = `╔══════════════════╗
+║ 🤖 *𝗡𝗜𝗖𝗞-𝗫𝗠𝗗 𝗠𝗘𝗡𝗨*
+╠══════════════════╣
+║ 👤 *User:* ${pushName}
+║ 📅 *Date:* ${date}
+║ ⏰ *Time:* ${time}
+║ 🕒 *Uptime:* ${uptime}
+║ 📟 *RAM:* ${ram}
+║ 🔑 *Prefix:* ${config.PREFIX}
+║ 🌍 *Mode:* ${config.MODE.toUpperCase()}
+╚══════════════════╝
 
-*Command List 🔽*`;
+*𝖢𝗈𝗆𝗆𝖺𝗇𝖽 𝖫𝗂𝗌𝗍 🔽*`;
 
-        for (const category in commandsByCategory) {
-            menu += `\n\n╭━━━━❎ *${monospace(category)}* ❎━⊷\n`;
-            commandsByCategory[category].sort().forEach(cmdName => {
-                menu += `┃🔹 ${monospace(config.PREFIX + cmdName)}\n`;
+        // Sort and add categories
+        Object.keys(categories).sort().forEach(cat => {
+            menuText += `\n\n╔══⊷ *${cat}* 💠`;
+            categories[cat].sort().forEach(cmdName => {
+                menuText += `\n║ 🔹 ${config.PREFIX}${cmdName}`;
             });
-            menu += `╰━━━━━━━━━━━━━━━━━⊷`;
-        }
+            menuText += `\n╚═════════════════⊷`;
+        });
 
-        menu += `\n\n> *${config.BOT_NAME || 'nick-MD'}* © 2026 🇰🇪`;
+        menuText += `\n\n> *${config.BOT_NAME || 'NICK-XMD'}* © 2026 🇰🇪`;
 
-        // Efficient Send
+        // Use Catbox or Placeholder if local image fails
+        const menuImg = "https://files.catbox.moe/4audtn.png"; 
+
         await conn.sendMessage(from, {
-            image: menuImageBuffer ? { url: menuImagePath } : { url: 'https://via.placeholder.com/500' },
-            caption: menu,
+            image: { url: menuImg },
+            caption: menuText,
             contextInfo: {
-                mentionedJid: [sender],
-                forwardingScore: 1,
                 externalAdReply: {
-                    title: 'POP KID-MD V2 ADVANCED',
-                    body: 'nick TECH',
-                    thumbnail: menuImageBuffer,
-                    sourceUrl: 'https://whatsapp.com/channel/0029VacgxK96hENmSRMRxx1r',
+                    title: "𝗡𝗜𝗖𝗞-𝗫𝗠𝗗 𝗩𝟭",
+                    body: "Created by Popkid Tech",
+                    thumbnailUrl: menuImg,
+                    sourceUrl: "https://whatsapp.com/channel/0029VacgxK96hENmSRMRxx1r",
                     mediaType: 1,
                     renderLargerThumbnail: true
                 }
@@ -99,7 +89,7 @@ cmd({
         }, { quoted: mek });
 
     } catch (e) {
-        console.error(e);
-        reply('❌ Menu processing error.');
+        console.error("Menu Error:", e);
+        reply("❌ Error generating menu: " + e.message);
     }
 });
