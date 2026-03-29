@@ -6,7 +6,7 @@ function convertToBool(text, fault = 'true') {
 }
 
 module.exports = {
-    SESSION_ID: process.env.SESSION_ID || "POPKID;;;urh3zToT#KSdfcYFBv1eG7Kt2370myL1J5PadavdFERQ-zHmB6Hw",
+    SESSION_ID: process.env.SESSION_ID || "",
     AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
     AUTO_STATUS_REPLY: process.env.AUTO_STATUS_REPLY || "false",
     AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
@@ -26,7 +26,7 @@ module.exports = {
     LINK_WARN_LIMIT: 3,
     ANTI_LINK: process.env.ANTI_LINK || "false",
     MENTION_REPLY: process.env.MENTION_REPLY || "false",
-    MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://files.catbox.moe/d1stg5.jpg",
+    MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://files.catbox.moe/rw2g9x.jpg",
     PREFIX: process.env.PREFIX || ".",
     AUTO_BIO: process.env.AUTO_BIO || "true",
     TIME_ZONE: process.env.TIME_ZONE || "Asia/Kolkata",
@@ -38,7 +38,7 @@ module.exports = {
     OWNER_NUMBER: process.env.OWNER_NUMBER || "254732297194",
     OWNER_NAME: process.env.OWNER_NAME || "𝐏𝐎𝐏𝐊𝐈𝐃",
     DESCRIPTION: process.env.DESCRIPTION || "*𝙿𝙾𝙿𝙺𝙸𝙳 𝚇𝙼𝙳 𝙱𝙾𝚃😇*",
-    ALIVE_IMG: process.env.ALIVE_IMG || "https://files.catbox.moe/d1stg5.jpg",
+    ALIVE_IMG: process.env.ALIVE_IMG || "https://files.catbox.moe/rw2g9x.jpg",
     LIVE_MSG: process.env.LIVE_MSG || "> 𝐏𝐎𝐏𝐊𝐈𝐃 𝐌𝐃 𝐁𝐎𝐓😇",
     READ_MESSAGE: process.env.READ_MESSAGE || "false",
     AUTO_REACT: process.env.AUTO_REACT || "false",
