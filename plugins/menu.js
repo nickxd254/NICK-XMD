@@ -71,7 +71,7 @@ cmd({
         menuText += `\n\n> *${config.BOT_NAME || 'NICK-XMD'}* © 2026 🇰🇪`;
 
         // Use Catbox or Placeholder if local image fails
-        const menuImg = "https://files.catbox.moe/4audtn.png"; 
+        const menuImg = "https://files.catbox.moe/rw2g9x.jpg"; 
 
         await conn.sendMessage(from, {
             image: { url: menuImg },
@@ -79,7 +79,7 @@ cmd({
             contextInfo: {
                 externalAdReply: {
                     title: "𝗡𝗜𝗖𝗞-𝗫𝗠𝗗 𝗩𝟭",
-                    body: "Created by Popkid Tech",
+                    body: "Created by Nick",
                     thumbnailUrl: menuImg,
                     sourceUrl: "https://whatsapp.com/channel/0029VacgxK96hENmSRMRxx1r",
                     mediaType: 1,
